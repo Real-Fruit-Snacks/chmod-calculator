@@ -24,7 +24,7 @@ ever leaves the page. Open `index.html` from a USB stick and it works.
 ## Features
 
 - Read and write Unix permissions three ways — checkboxes, octal (`755`), and symbolic (`rwxr-xr-x`) — all kept in sync.
-- setuid, setgid, and sticky-bit support with plain-English notes.
+- setuid, setgid, and sticky-bit checkboxes built right into the permission grid.
 - Click a common preset to load it instantly.
 - **Both themes, six accents** — dark by default, light by preference or toggle; inputs, scrollbars and focus rings all follow the theme.
 - **The ghost** — the family site pet, ported from [worldclock](https://github.com/Real-Fruit-Snacks/worldclock). It drifts, naps, and flees the cursor. Click it to recolor it.
