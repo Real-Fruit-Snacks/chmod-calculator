@@ -49,28 +49,25 @@ var po=parseInt(localStorage.getItem("chm-pet-opacity"),10);if(po>=15&&po<=100)d
 </div>
 <div id="ch-error" class="ch-error" hidden></div>
 <table class="ch-grid" id="ch-grid">
-<thead><tr><th></th><th>read (4)</th><th>write (2)</th><th>execute (1)</th></tr></thead>
+<thead><tr><th></th><th>read (4)</th><th>write (2)</th><th>execute (1)</th><th>special</th></tr></thead>
 <tbody>
 <tr><td>owner</td>
-  <td><input type="checkbox" data-bit="256"></td>
-  <td><input type="checkbox" data-bit="128"></td>
-  <td><input type="checkbox" data-bit="64"></td></tr>
+  <td><input type="checkbox" data-bit="256" aria-label="owner read"></td>
+  <td><input type="checkbox" data-bit="128" aria-label="owner write"></td>
+  <td><input type="checkbox" data-bit="64" aria-label="owner execute"></td>
+  <td class="ch-special-cell"><label class="ch-check"><input type="checkbox" id="ch-setuid"> setuid <span class="ch-bit">4000</span></label></td></tr>
 <tr><td>group</td>
-  <td><input type="checkbox" data-bit="32"></td>
-  <td><input type="checkbox" data-bit="16"></td>
-  <td><input type="checkbox" data-bit="8"></td></tr>
+  <td><input type="checkbox" data-bit="32" aria-label="group read"></td>
+  <td><input type="checkbox" data-bit="16" aria-label="group write"></td>
+  <td><input type="checkbox" data-bit="8" aria-label="group execute"></td>
+  <td class="ch-special-cell"><label class="ch-check"><input type="checkbox" id="ch-setgid"> setgid <span class="ch-bit">2000</span></label></td></tr>
 <tr><td>others</td>
-  <td><input type="checkbox" data-bit="4"></td>
-  <td><input type="checkbox" data-bit="2"></td>
-  <td><input type="checkbox" data-bit="1"></td></tr>
+  <td><input type="checkbox" data-bit="4" aria-label="others read"></td>
+  <td><input type="checkbox" data-bit="2" aria-label="others write"></td>
+  <td><input type="checkbox" data-bit="1" aria-label="others execute"></td>
+  <td class="ch-special-cell"><label class="ch-check"><input type="checkbox" id="ch-sticky"> sticky <span class="ch-bit">1000</span></label></td></tr>
 </tbody>
 </table>
-<div class="ch-special">
-  <span class="manifest-label">special bits</span>
-  <label class="ch-check"><input type="checkbox" id="ch-setuid"> setuid (4000)</label>
-  <label class="ch-check"><input type="checkbox" id="ch-setgid"> setgid (2000)</label>
-  <label class="ch-check"><input type="checkbox" id="ch-sticky"> sticky (1000)</label>
-</div>
 <div id="ch-warn" class="ch-warn" hidden></div>
 <figure class="code-block">
 <figcaption class="code-lang manifest-label">chmod</figcaption>
