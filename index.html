@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chmod Calculator</title>
+<meta name="description" content="Unix permissions three ways — checkboxes, octal, and symbolic — kept in sync live, special bits included.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Crect%20width='16'%20height='16'%20rx='3'%20fill='%23090c0d'/%3E%3Cpath%20d='M3.5%205L6.5%208L3.5%2011'%20fill='none'%20stroke='%2363f2ab'%20stroke-width='1.4'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Crect%20x='8'%20y='9.6'%20width='5'%20height='1.5'%20rx='0.5'%20fill='%2363f2ab'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0e1214">
+<script>(function(){try{
+var t=localStorage.getItem("chm-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);
+var a=localStorage.getItem("chm-accent");if(a&&"12345".indexOf(a)>-1)document.documentElement.setAttribute("data-accent",a);
+var pm=localStorage.getItem("chm-pet");document.documentElement.setAttribute("data-pet",pm==="off"?"off":(pm==="cursor"?"cursor":"float"));
+var ps=parseInt(localStorage.getItem("chm-pet-size"),10);if(ps>=16&&ps<=64)document.documentElement.style.setProperty("--pet-size",ps+"px");
+var po=parseInt(localStorage.getItem("chm-pet-opacity"),10);if(po>=15&&po<=100)document.documentElement.style.setProperty("--pet-base-opacity",(po/100).toFixed(3));
+}catch(e){}})();</script>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<header class="topbar">
+  <span class="manifest-label site-title">CHMOD CALCULATOR</span>
+  <span class="topbar-actions">
+    <button id="btn-settings" class="icon-btn" title="Settings (s)" aria-label="Settings"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="2.2" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+    <button id="btn-theme" class="icon-btn" title="Toggle theme (t)" aria-label="Toggle theme"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M13 9.5A5.5 5.5 0 1 1 6.5 3 4.5 4.5 0 0 0 13 9.5Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg></button>
+  </span>
+</header>
+<main>
+  <article class="note note-wide">
+    <header class="note-header"><h1>Chmod Calculator</h1><p class="tool-desc">Unix permissions three ways — checkboxes, octal, and symbolic — kept in sync live, special bits included.</p></header>
+<p>Change any representation — the others follow live.</p>
+<div class="ch-io-row">
+  <div class="ch-io">
+    <label class="manifest-label" for="ch-octal">octal</label>
+    <input id="ch-octal" type="text" value="754" maxlength="4" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="ch-io">
+    <label class="manifest-label" for="ch-symbolic">symbolic</label>
+    <input id="ch-symbolic" type="text" value="rwxr-xr--" maxlength="9" autocomplete="off" spellcheck="false">
+  </div>
+</div>
+<div class="ch-examples">
+  <button type="button" class="ch-example" data-octal="755">755</button>
+  <button type="button" class="ch-example" data-octal="644">644</button>
+  <button type="button" class="ch-example" data-octal="600">600</button>
+  <button type="button" class="ch-example" data-octal="777">777</button>
+  <button type="button" class="ch-example" data-octal="1777">1777</button>
+  <button type="button" class="ch-example" data-octal="4755">4755</button>
+</div>
+<div id="ch-error" class="ch-error" hidden></div>
+<table class="ch-grid" id="ch-grid">
+<thead><tr><th></th><th>read (4)</th><th>write (2)</th><th>execute (1)</th></tr></thead>
+<tbody>
+<tr><td>owner</td>
+  <td><input type="checkbox" data-bit="256"></td>
+  <td><input type="checkbox" data-bit="128"></td>
+  <td><input type="checkbox" data-bit="64"></td></tr>
+<tr><td>group</td>
+  <td><input type="checkbox" data-bit="32"></td>
+  <td><input type="checkbox" data-bit="16"></td>
+  <td><input type="checkbox" data-bit="8"></td></tr>
+<tr><td>others</td>
+  <td><input type="checkbox" data-bit="4"></td>
+  <td><input type="checkbox" data-bit="2"></td>
+  <td><input type="checkbox" data-bit="1"></td></tr>
+</tbody>
+</table>
+<div class="ch-special">
+  <span class="manifest-label">special bits</span>
+  <label class="ch-check"><input type="checkbox" id="ch-setuid"> setuid (4000)</label>
+  <label class="ch-check"><input type="checkbox" id="ch-setgid"> setgid (2000)</label>
+  <label class="ch-check"><input type="checkbox" id="ch-sticky"> sticky (1000)</label>
+</div>
+<div id="ch-warn" class="ch-warn" hidden></div>
+<figure class="code-block">
+<figcaption class="code-lang manifest-label">chmod</figcaption>
+<pre class="code-body"><code id="ch-output"></code></pre>
+</figure>
+<div class="ch-ls-row">
+  <span class="manifest-label">ls -l shows</span>
+  <code id="ch-ls"></code>
+</div>
+<details class="tool-learn"><summary class="manifest-label">unix permissions 101</summary><div class="tool-learn-body"><h3>The permission model</h3>
+<p>Every file has one <strong>owner</strong>, one <strong>group</strong>, and everyone
+else (<strong>others</strong>). Each of the three gets its own read / write / execute
+flags — nine bits total. <code>ls -l</code> prints them as three
+<code>rwx</code> triads after the type character:
+<code>-rwxr-xr--</code> means a regular file (<code>-</code>), owner
+<code>rwx</code>, group <code>r-x</code>, others <code>r--</code>. The rule that
+applies to you is the <em>first</em> one that matches — if you're the owner, only
+the owner triad counts, even if it's more restrictive than the others.</p>
+
+<h3>Octal is just addition</h3>
+<p>Each triad is one octal digit: <strong>read = 4, write = 2, execute = 1</strong>.
+Add what you want: <code>rwx</code> = 7, <code>r-x</code> = 5, <code>r--</code> = 4 —
+hence <code>754</code>. Three digits, owner-group-others, always in that order.</p>
+
+<h3>Files vs directories — the x surprise</h3>
+<p>The bits mean different things on directories:</p>
+<table>
+<thead><tr><th>bit</th><th>on a file</th><th>on a directory</th></tr></thead>
+<tbody>
+<tr><td><code>r</code></td><td>read the contents</td><td>list the filenames</td></tr>
+<tr><td><code>w</code></td><td>modify the contents</td><td>create, delete, rename entries — <em>even files you don't own</em></td></tr>
+<tr><td><code>x</code></td><td>run it as a program</td><td>traverse into it (cd, open files inside)</td></tr>
+</tbody>
+</table>
+<p>A directory with <code>r</code> but not <code>x</code> lets you see names but touch
+nothing; <code>x</code> without <code>r</code> lets you open files inside if you
+already know their names. Directories almost always want <code>r-x</code> together.</p>
+
+<h3>The special bits (the 4th octal digit)</h3>
+<ul>
+<li><strong>setuid (4000)</strong> — an executable runs with its <em>owner's</em>
+identity instead of yours. It's how <code>passwd</code> edits a root-owned file.
+Shown as <code>s</code> in the owner's x slot (<code>S</code> if x is off — almost
+always a mistake). On modern systems setuid on shell scripts is ignored.</li>
+<li><strong>setgid (2000)</strong> — on executables, same idea with the group. On
+<em>directories</em> it's genuinely useful: new files inherit the directory's group —
+the standard trick for shared project folders.</li>
+<li><strong>sticky (1000)</strong> — on a world-writable directory, only a file's
+owner can delete it. That's why <code>/tmp</code> is <code>1777</code>
+(<code>drwxrwxrwt</code>).</li>
+</ul>
+
+<h3>Common recipes</h3>
+<table>
+<thead><tr><th>mode</th><th>use</th></tr></thead>
+<tbody>
+<tr><td><code>755</code></td><td>directories and executables — owner full, everyone else read/traverse</td></tr>
+<tr><td><code>644</code></td><td>ordinary files — owner writes, everyone reads</td></tr>
+<tr><td><code>600</code></td><td>private files — SSH keys, credentials (ssh refuses keys looser than this)</td></tr>
+<tr><td><code>700</code></td><td>private directories — <code>~/.ssh</code></td></tr>
+<tr><td><code>2775</code></td><td>shared group directory with setgid inheritance</td></tr>
+<tr><td><code>1777</code></td><td>world-writable drop box with sticky protection — /tmp</td></tr>
+</tbody>
+</table>
+
+<h3>umask — why new files aren't 777</h3>
+<p>The <strong>umask</strong> subtracts bits from what programs request. With the
+usual <code>022</code>, a program creating a file as 666 gets 644, a directory
+requested as 777 gets 755. Check yours with <code>umask</code>; a stricter
+<code>077</code> makes everything private by default.</p>
+</div></details>
+  </article>
+</main>
+<footer class="footer">
+  <span class="mono">runs entirely in your browser · nothing is uploaded</span>
+  <a class="mono" href="https://github.com/Real-Fruit-Snacks/chmod-calculator" rel="noopener">source</a>
+</footer>
+
+<div id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-label="Settings" hidden></div>
+<div id="settings-scrim" class="settings-scrim" hidden></div>
+<div id="help-overlay" class="help-overlay" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" hidden></div>
+<div id="site-pet" aria-hidden="true"><div class="pet-tilt"><div class="pet-sprite" title="pet the ghost to recolor it"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path class="pet-body" d="M2 16 V7 Q2 1 8 1 Q14 1 14 7 V16 L12 14.4 L10 16 L8 14.4 L6 16 L4 14.4 Z"/><g class="pet-eyes-open"><rect x="5" y="6" width="2" height="3"/><rect x="9" y="6" width="2" height="3"/></g><g class="pet-eyes-closed"><rect x="5" y="8" width="2" height="1"/><rect x="9" y="8" width="2" height="1"/></g><g class="pet-eyes-happy"><path d="M4.6 8 L6 6.6 L7.4 8"/><path d="M8.6 8 L10 6.6 L11.4 8"/></g></svg></div></div></div>
+
+<script src="js/settings.js"></script>
+<script src="js/tool.js"></script>
+<script src="js/content.js"></script>
+<script src="js/pet.js"></script>
+</body>
+</html>
